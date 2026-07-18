@@ -1,0 +1,42 @@
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors and operating-system state
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dependencies, generated output, and caches
+node_modules/
+dist/
+coverage/
+.cache/
+.parcel-cache/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+*.local
+auth.json
+local.properties
+secure.properties
+keystore.properties
+
+# Keys and signing material
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore

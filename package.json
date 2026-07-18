@@ -1,0 +1,18 @@
+{
+  "name": "login-chase",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "A harmless fake login button that avoids the user.",
+  "packageManager": "pnpm@10.28.2",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "check": "node --check script.js && node scripts/verify.mjs",
+    "test": "pnpm run check",
+    "build": "node scripts/build.mjs",
+    "verify": "pnpm run check && pnpm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'none'; connect-src 'none'; form-action 'none'; frame-src 'none'; img-src 'self' data:; media-src 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      name="description"
+      content="LoginChase is a harmless fake login button that would rather be anywhere else."
+    />
+    <meta name="theme-color" content="#2457ff" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="LoginChase" />
+    <meta
+      property="og:description"
+      content="A harmless fake login button that would rather be anywhere else."
+    />
+    <meta name="twitter:card" content="summary" />
+    <title>LoginChase — Authentication is playing hard to get</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#login-heading">Skip to the fake login</a>
+
+    <div class="page-shell">
+      <header class="utility-bar" aria-label="LoginChase controls">
+        <a class="wordmark" href="#top" aria-label="LoginChase home">
+          <span class="wordmark-mark" aria-hidden="true">LC</span>
+          <span>LoginChase</span>
+        </a>
+
+        <div class="utility-actions">
+          <button
+            class="utility-button"
+            id="sound-toggle"
+            type="button"
+            aria-pressed="true"
+          >
+            <span class="sound-icon" aria-hidden="true">♪</span>
+            <span id="sound-label">Sound: on</span>
+          </button>
+          <button class="utility-button" id="reset-button" type="button">
+            Reset
+          </button>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="intro" aria-labelledby="page-title">
+          <div class="case-label">
+            <span>Case file</span>
+            <strong>LC—010</strong>
+          </div>
+
+          <h1 id="page-title">
+            Authentication is
+            <span>playing hard to get.</span>
+          </h1>
+          <p class="intro-copy">
+            This login button has trust issues. Catch it ten times and it may
+            finally let you into a dashboard that does absolutely nothing.
+          </p>
+
+          <div class="rules-tape" aria-label="Rules of engagement">
+            <span>10 attempts</span>
+            <span>0 data sent</span>
+            <span>1 dramatic button</span>
+          </div>
+        </section>
+
+        <section class="experience" aria-label="Fake login challenge">
+          <div class="login-panel" id="login-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Secure-ish access portal</p>
+                <h2 id="login-heading">Prove you are patient</h2>
+              </div>
+              <div class="attempt-readout" aria-hidden="true">
+                <strong id="attempt-count">0</strong>
+                <span>/ 10 tries</span>
+              </div>
+            </div>
+
+            <div
+              class="attempt-meter"
+              id="attempt-meter"
+              role="progressbar"
+              aria-label="Login attempts"
+              aria-valuemin="0"
+              aria-valuemax="10"
+              aria-valuenow="0"
+              aria-valuetext="0 of 10 attempts"
+            >
+              <span id="meter-fill"></span>
+            </div>
+
+            <form
+              id="login-form"
+              autocomplete="off"
+              novalidate
+              aria-describedby="privacy-note"
+            >
+              <div class="field-group">
+                <label for="fake-email">Fake email</label>
+                <input
+                  id="fake-email"
+                  type="email"
+                  inputmode="email"
+                  autocomplete="off"
+                  data-lpignore="true"
+                  placeholder="definitely@not-saved.test"
+                />
+              </div>
+
+              <div class="field-group">
+                <label for="fake-password">Fake password</label>
+                <input
+                  id="fake-password"
+                  type="password"
+                  autocomplete="off"
+                  data-lpignore="true"
+                  placeholder="Anything. We never read it."
+                />
+              </div>
+
+              <label class="check-row" for="remember-me">
+                <input id="remember-me" type="checkbox" />
+                <span class="fake-check" aria-hidden="true"></span>
+                <span>Remember Me</span>
+                <small>(bold request)</small>
+              </label>
+
+              <p class="privacy-note" id="privacy-note">
+                <strong>No real authentication.</strong> Your typing stays in
+                these fields until you clear, reset, reload, or close the page.
+              </p>
+
+              <div class="status-wrap">
+                <span class="status-pin" aria-hidden="true"></span>
+                <p id="game-status" role="status" aria-live="polite" aria-atomic="true">
+                  Approach the Login button. It seems completely normal.
+                </p>
+              </div>
+
+              <div
+                class="chase-arena"
+                id="chase-arena"
+                aria-label="Login and cancel controls"
+              >
+                <span class="arena-label" aria-hidden="true">Button containment zone</span>
+                <span class="arena-line arena-line-one" aria-hidden="true"></span>
+                <span class="arena-line arena-line-two" aria-hidden="true"></span>
+                <div class="trapdoor" aria-hidden="true">Totally not a hiding place</div>
+
+                <button class="action-button cancel-button" id="cancel-button" type="button">
+                  Cancel
+                </button>
+                <button class="action-button login-button" id="login-button" type="submit">
+                  Login
+                </button>
+                <div class="decoy-layer" id="decoy-layer"></div>
+              </div>
+
+              <p class="keyboard-hint">
+                Keyboard friendly: use <kbd>Tab</kbd>, then <kbd>Enter</kbd> or
+                <kbd>Space</kbd>. The button only dodges when you activate it.
+              </p>
+            </form>
+          </div>
+
+          <section
+            class="dashboard"
+            id="dashboard"
+            aria-labelledby="dashboard-title"
+            tabindex="-1"
+            hidden
+          >
+            <div class="confetti" id="confetti" aria-hidden="true"></div>
+            <p class="dashboard-kicker">Access eventually granted</p>
+            <h2 id="dashboard-title">You outlasted the login.</h2>
+            <p class="dashboard-copy">
+              Welcome to your fake dashboard. Your reward is this deeply
+              impressive collection of verified non-achievements.
+            </p>
+
+            <dl class="dashboard-stats">
+              <div>
+                <dt>Attempts survived</dt>
+                <dd>10</dd>
+              </div>
+              <div>
+                <dt>Credentials sent</dt>
+                <dd>0</dd>
+              </div>
+              <div>
+                <dt>Patience status</dt>
+                <dd>Verified</dd>
+              </div>
+            </dl>
+
+            <div class="dashboard-seal" aria-hidden="true">
+              <span>✓</span>
+              <strong>Officially<br />logged-ish</strong>
+            </div>
+
+            <button class="action-button replay-button" id="replay-button" type="button">
+              Chase it again
+            </button>
+          </section>
+        </section>
+      </main>
+
+      <footer>
+        <p>LoginChase / An exercise in patience, not authentication.</p>
+        <p>No backend. No tracking. No credential handling.</p>
+      </footer>
+    </div>
+
+    <noscript>
+      <div class="noscript-message">
+        LoginChase needs JavaScript for the chase. It still does not need your
+        credentials.
+      </div>
+    </noscript>
+  </body>
+</html>
