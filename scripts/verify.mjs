@@ -19,6 +19,47 @@ function contrastRatio(first, second) {
   return (values[0] + 0.05) / (values[1] + 0.05);
 }
 
+function ruleBody(selector, source = css) {
+  const start = source.indexOf(`${selector} {`);
+  assert.notEqual(start, -1, `Missing CSS rule ${selector}`);
+  return source.slice(source.indexOf("{", start) + 1, source.indexOf("}", start));
+}
+
+function declaration(selector, property, source = css) {
+  const pattern = new RegExp(
+    `(?:^|\\n)\\s*${property.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}\\s*:\\s*([\\s\\S]*?);`,
+  );
+  let cursor = 0;
+  let value;
+
+  while ((cursor = source.indexOf(`${selector} {`, cursor)) !== -1) {
+    const body = source.slice(source.indexOf("{", cursor) + 1, source.indexOf("}", cursor));
+    const match = body.match(pattern);
+    if (match) value = match[1].trim();
+    cursor += selector.length + 2;
+  }
+
+  assert.ok(value, `Missing ${property} in ${selector}`);
+  return value;
+}
+
+function resolvedColor(value, seen = new Set()) {
+  const variable = value.match(/^var\(--([^)]+)\)$/);
+  if (!variable) {
+    assert.match(value, /^#[0-9a-f]{6}$/i, `Unsupported color ${value}`);
+    return value.toLowerCase();
+  }
+  assert.equal(seen.has(variable[1]), false, `Circular CSS variable --${variable[1]}`);
+  seen.add(variable[1]);
+  return resolvedColor(declaration(":root", `--${variable[1]}`), seen);
+}
+
+function mediaStart(query) {
+  const position = css.indexOf(`@media ${query} {`);
+  assert.notEqual(position, -1, `Missing media query ${query}`);
+  return position;
+}
+
 const requiredIds = [
   "fake-email",
   "fake-password",
@@ -117,6 +158,7 @@ for (const color of ["#15152a", "#fff5df", "#ff5d5d", "#4f7cff", "#ffd166", "#58
 }
 assert.match(html, /href="https:\/\/sudarshanchaudhari\.github\.io\/TinyChaos\/"/);
 assert.match(html, /LoginChase · by Sudarshan Chaudhari/);
+assert.match(html, /LoginChase \/ An exercise in patience, not authentication\./);
 assert.match(css, /outline:\s*4px solid var\(--blue\)/, "Focus treatment must use TinyChaos blue");
 assert.match(css, /\.dashboard \.action-button:focus-visible\s*\{[^}]*var\(--paper\)[^}]*var\(--ink\)/s);
 assert.match(css, /--display-font:\s*Impact/);
@@ -126,13 +168,36 @@ assert.match(css, /\.login-button\s*\{[^}]*color:\s*var\(--ink\)[^}]*background:
 assert.match(css, /\.decoy-button\s*\{[^}]*color:\s*var\(--ink\)[^}]*background:\s*var\(--blue\)/s);
 assert.match(css, /\.dashboard\s*\{[^}]*background:\s*var\(--blue-dark\)/s);
 assert.match(css, /overflow-x:\s*clip/);
-assert.ok(contrastRatio("#a83b44", "#fffef9") >= 4.5, "Attempt text must meet WCAG AA");
-assert.ok(contrastRatio("#15152a", "#4f7cff") >= 4.5, "Button text must meet WCAG AA");
-assert.ok(contrastRatio("#fffef9", "#1739a6") >= 4.5, "Dashboard text must meet WCAG AA");
-assert.ok(contrastRatio("#ffd166", "#1739a6") >= 4.5, "Dashboard accent text must meet WCAG AA");
-for (const rule of css.matchAll(/(?:^|\n)(?:html|body)\s*\{([^}]*)\}/g)) {
-  assert.doesNotMatch(rule[1], /min-width:\s*(?:280|320)px/);
-}
+const loginPanelBackground = resolvedColor(declaration(".login-panel,\n.dashboard", "background"));
+assert.ok(contrastRatio(resolvedColor(declaration(".attempt-readout strong", "color")), loginPanelBackground) >= 4.5);
+assert.ok(contrastRatio(resolvedColor(declaration(".login-button", "color")), resolvedColor(declaration(".login-button", "background"))) >= 4.5);
+const dashboardBackground = resolvedColor(declaration(".dashboard", "background"));
+assert.ok(contrastRatio(resolvedColor(declaration(".dashboard", "color")), dashboardBackground) >= 4.5);
+assert.ok(contrastRatio(resolvedColor(declaration(".dashboard-kicker", "color")), dashboardBackground) >= 4.5);
+assert.ok(
+  contrastRatio(
+    resolvedColor(declaration(".noscript-message", "color")),
+    resolvedColor(declaration(".noscript-message", "background")),
+  ) >= 4.5,
+  "No-script message must meet WCAG AA",
+);
+
+const widths = [...css.matchAll(/@media \(max-width: (\d+)px\)\s*\{/g)].map((match) => Number(match[1]));
+assert.deepEqual(widths, [880, 560], "Width breakpoints must cover tablet and 320/375px layouts");
+const tablet = mediaStart("(max-width: 880px)");
+const mobile = mediaStart("(max-width: 560px)");
+const narrowShort = mediaStart("(max-width: 640px) and (max-height: 500px)");
+const reduced = mediaStart("(prefers-reduced-motion: reduce)");
+assert.ok(tablet < mobile && mobile < narrowShort && narrowShort < reduced, "Responsive cascade order changed");
+const narrowSection = css.slice(narrowShort, reduced);
+assert.equal(declaration("main", "min-height", narrowSection), "auto");
+assert.equal(declaration("main", "padding", narrowSection), "2rem 0 3rem");
+assert.doesNotMatch(css.slice(reduced), /main\s*\{[^}]*min-height\s*:/s, "A later rule overrides narrow/short flow");
+assert.equal(declaration("body", "overflow-y"), "auto");
+assert.equal(declaration("body", "overflow-x"), "clip");
+assert.equal(declaration("body", "min-width"), "0");
+assert.doesNotMatch(ruleBody("html"), /min-width\s*:\s*(?!0(?:px)?\s*;)/, "HTML has a positive minimum width");
+assert.match(declaration(".page-shell", "width", css.slice(0, tablet)), /1180px/, "Base rule must retain laptop/desktop cap");
 assert.match(readme, /never reads, stores, or transmits/i, "README must document credential safety");
 assert.match(headers, /X-Content-Type-Options:\s*nosniff/i, "Missing nosniff hosting header");
 assert.match(headers, /X-Frame-Options:\s*DENY/i, "Missing anti-framing hosting header");
