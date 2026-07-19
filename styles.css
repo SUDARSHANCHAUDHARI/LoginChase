@@ -7,6 +7,7 @@
   --blue: #4f7cff;
   --blue-dark: #1739a6;
   --coral: #ff5d5d;
+  --coral-text: #a83b44;
   --yellow: #ffd166;
   --mint: #58d6a9;
   --lilac: #b695ff;
@@ -287,7 +288,7 @@ h1 span {
 }
 
 .attempt-readout strong {
-  color: var(--coral);
+  color: var(--coral-text);
   font-family: var(--display-font);
   font-size: 2.4rem;
   line-height: 1;
@@ -566,7 +567,7 @@ h1 span {
 .login-button {
   z-index: 5;
   right: 1rem;
-  color: var(--white);
+  color: var(--ink);
   background: var(--blue);
 }
 
@@ -622,7 +623,7 @@ h1 span {
   padding: 0.55rem 0.7rem;
   border: 1.5px solid var(--ink);
   border-radius: 0.55rem;
-  color: var(--white);
+  color: var(--ink);
   background: var(--blue);
   font-size: 0.76rem;
   font-weight: 800;
@@ -664,7 +665,7 @@ a:focus-visible {
 .dashboard {
   min-height: 35rem;
   padding: clamp(2rem, 6vw, 3.5rem);
-  background: var(--blue);
+  background: var(--blue-dark);
   color: var(--white);
 }
 

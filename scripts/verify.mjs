@@ -9,6 +9,16 @@ const [html, css, javascript, readme, headers] = await Promise.all([
   readFile("_headers", "utf8"),
 ]);
 
+function contrastRatio(first, second) {
+  const luminance = (hex) => {
+    const channels = hex.slice(1).match(/.{2}/g).map((value) => Number.parseInt(value, 16) / 255);
+    const linear = channels.map((value) => value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+  };
+  const values = [luminance(first), luminance(second)].sort((a, b) => b - a);
+  return (values[0] + 0.05) / (values[1] + 0.05);
+}
+
 const requiredIds = [
   "fake-email",
   "fake-password",
@@ -111,7 +121,15 @@ assert.match(css, /outline:\s*4px solid var\(--blue\)/, "Focus treatment must us
 assert.match(css, /\.dashboard \.action-button:focus-visible\s*\{[^}]*var\(--paper\)[^}]*var\(--ink\)/s);
 assert.match(css, /--display-font:\s*Impact/);
 assert.match(css, /--body-font:\s*"Arial Rounded MT Bold"/);
+assert.match(css, /\.attempt-readout strong\s*\{[^}]*color:\s*var\(--coral-text\)/s);
+assert.match(css, /\.login-button\s*\{[^}]*color:\s*var\(--ink\)[^}]*background:\s*var\(--blue\)/s);
+assert.match(css, /\.decoy-button\s*\{[^}]*color:\s*var\(--ink\)[^}]*background:\s*var\(--blue\)/s);
+assert.match(css, /\.dashboard\s*\{[^}]*background:\s*var\(--blue-dark\)/s);
 assert.match(css, /overflow-x:\s*clip/);
+assert.ok(contrastRatio("#a83b44", "#fffef9") >= 4.5, "Attempt text must meet WCAG AA");
+assert.ok(contrastRatio("#15152a", "#4f7cff") >= 4.5, "Button text must meet WCAG AA");
+assert.ok(contrastRatio("#fffef9", "#1739a6") >= 4.5, "Dashboard text must meet WCAG AA");
+assert.ok(contrastRatio("#ffd166", "#1739a6") >= 4.5, "Dashboard accent text must meet WCAG AA");
 for (const rule of css.matchAll(/(?:^|\n)(?:html|body)\s*\{([^}]*)\}/g)) {
   assert.doesNotMatch(rule[1], /min-width:\s*(?:280|320)px/);
 }
