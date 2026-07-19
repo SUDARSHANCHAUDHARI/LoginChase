@@ -28,10 +28,13 @@ requiredIds.forEach((id) => {
 
 const documentIds = [...html.matchAll(/\sid=["']([^"']+)["']/g)].map((match) => match[1]);
 assert.equal(new Set(documentIds).size, documentIds.length, "HTML ids must be unique");
-assert.doesNotMatch(
-  html,
-  /\b(?:href|src)=["']https?:\/\//i,
-  "Runtime HTML must not load external assets",
+const remoteReferences = [...html.matchAll(/\b(?:href|src)=["'](https?:\/\/[^"']+)["']/gi)].map(
+  (match) => match[1],
+);
+assert.deepEqual(
+  remoteReferences,
+  ["https://sudarshanchaudhari.github.io/TinyChaos/"],
+  "Only the TinyChaos gallery navigation may use a remote URL",
 );
 
 const requiredReactions = [
@@ -99,6 +102,19 @@ assert.match(javascript, /addEventListener\("click"/, "Missing native button act
 assert.match(javascript, /addEventListener\("submit"/, "Missing keyboard form submission support");
 assert.match(css, /prefers-reduced-motion:\s*reduce/, "Missing reduced-motion support");
 assert.match(css, /:focus-visible/, "Missing visible keyboard focus styles");
+for (const color of ["#15152a", "#fff5df", "#ff5d5d", "#4f7cff", "#ffd166", "#58d6a9", "#b695ff"]) {
+  assert.match(css, new RegExp(color, "i"), `Missing shared TinyChaos color ${color}`);
+}
+assert.match(html, /href="https:\/\/sudarshanchaudhari\.github\.io\/TinyChaos\/"/);
+assert.match(html, /LoginChase · by Sudarshan Chaudhari/);
+assert.match(css, /outline:\s*4px solid var\(--blue\)/, "Focus treatment must use TinyChaos blue");
+assert.match(css, /\.dashboard \.action-button:focus-visible\s*\{[^}]*var\(--paper\)[^}]*var\(--ink\)/s);
+assert.match(css, /--display-font:\s*Impact/);
+assert.match(css, /--body-font:\s*"Arial Rounded MT Bold"/);
+assert.match(css, /overflow-x:\s*clip/);
+for (const rule of css.matchAll(/(?:^|\n)(?:html|body)\s*\{([^}]*)\}/g)) {
+  assert.doesNotMatch(rule[1], /min-width:\s*(?:280|320)px/);
+}
 assert.match(readme, /never reads, stores, or transmits/i, "README must document credential safety");
 assert.match(headers, /X-Content-Type-Options:\s*nosniff/i, "Missing nosniff hosting header");
 assert.match(headers, /X-Frame-Options:\s*DENY/i, "Missing anti-framing hosting header");
